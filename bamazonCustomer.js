@@ -4,6 +4,8 @@ var inquirer = require("inquirer");
 var selectedItemNumber;
 var quantity;
 var stockUpdate;
+
+//stand up database 
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -13,12 +15,11 @@ var connection = mysql.createConnection({
     password: "Makerasll91!",
     database: "bamazon"
   });
-//   connection.connect(function(err) {
-//     if (err) throw err;
-//     console.log("connected as id " + connection.threadId);
-    
-//    connection.end();
-//   });
+  connection.connect(function(err) {
+    if (err) throw err;
+    // console.log("connected as id " + connection.threadId);
+    showWares();
+  });
 
 //show whats in database - ids, names, prices
 function showWares() {
@@ -33,10 +34,10 @@ function showWares() {
           console.log(`${item_id}: ${product_name} @ $${price} each`);        
       });
     //   connection.end();
+    buyFunction();
     });
   }
 
-  showWares()
 
   
 
@@ -60,7 +61,7 @@ function buyFunction() {
     checkStock();
     });
 }
-buyFunction();
+
 
 function checkStock() {
     //get stock of item
