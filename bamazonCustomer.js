@@ -4,6 +4,7 @@ var inquirer = require("inquirer");
 var selectedItemNumber;
 var quantity;
 var stockUpdate;
+var salesUpdate;
 
 //stand up database 
 var connection = mysql.createConnection({
@@ -12,7 +13,7 @@ var connection = mysql.createConnection({
     // Your username
     user: "root",
     // Your password
-    password: "Redacted",
+    password: "Makerasll91!",
     database: "bamazon"
   });
   connection.connect(function(err) {
@@ -39,8 +40,6 @@ function showWares() {
   }
 
 
-  
-
 //ask what id to buy?
 function buyFunction() {
     inquirer.prompt([
@@ -65,13 +64,16 @@ function buyFunction() {
 
 function checkStock() {
     //get stock of item
-    connection.query(`SELECT stock_quantity, price FROM products WHERE item_id=${selectedItemNumber}`, function(err, res) {
+    connection.query(`SELECT stock_quantity, price, product_sales FROM products WHERE item_id=${selectedItemNumber}`, function(err, res) {
         if (err) throw err;
         let stock_quantity = res[0].stock_quantity;
         let price = res[0].price;
+        let origSales = res[0].product_sales;
         if (quantity < stock_quantity) {
             //subtract amount from stock
             stockUpdate = stock_quantity - quantity;
+            //calculate sales
+            salesUpdate = origSales + quantity*price;
             //update stock
             updateProduct();       
             //complete purchase 
@@ -92,13 +94,15 @@ function updateProduct() {
       "UPDATE products SET ? WHERE ?",
       [
         {
-          stock_quantity: stockUpdate
+          stock_quantity: stockUpdate,
+          product_sales:salesUpdate
         },
         {
           item_id: selectedItemNumber
         }
       ],
       function(err, res) {
+          if (err) throw err; 
         // console.log(res.affectedRows + " products updated!\n");
       }
     );

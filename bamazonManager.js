@@ -19,10 +19,10 @@ var selectedItemNumber;
   connection.connect(function(err) {
     if (err) throw err;
     // console.log("connected as id " + connection.threadId);
-  });
 
 
-//Menu you options
+
+//Menu options
 inquirer.prompt({
     type: "list",    
     name: "mgrChoice",
@@ -48,6 +48,9 @@ inquirer.prompt({
     }
 })
     
+});
+
+
 function showWares() {
     connection.query("SELECT * FROM products", function(err, res) {
       if (err) throw err;
