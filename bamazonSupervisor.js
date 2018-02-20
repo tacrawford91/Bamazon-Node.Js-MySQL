@@ -1,6 +1,7 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
-// var NewDepartment = require("./NewDepartment.js");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const NewDepartment = require("./NewDepartment.js");
+const cTable = require('console.table');
 
 //stand up database 
 var connection = mysql.createConnection({
@@ -29,12 +30,13 @@ inquirer.prompt({
 }).then(function(answer){
     var mgrChoice = answer.mgrChoice
     if (mgrChoice === "View Product Sales by Department") {
-        console.log(`Product Sales by Department below:`)
+        console.log(`Product Sales by Department below:`);
         //show table
         showDptSales();
     }
     if (mgrChoice === "Create New Department") {
         //create new department
+        addNewDept();
     }
 
     })
@@ -44,19 +46,43 @@ inquirer.prompt({
 //show department sales
 function showDptSales() {
     connection.query(`SELECT departments.department_id, products.department_name, departments.over_head_costs, SUM(product_sales) as product_sales, (SUM(product_sales) - departments.over_head_costs) as total_profit
-    from products right join departments 
+    from products left join departments 
     on products.department_name = departments.department_name
     GROUP BY department_name
     ORDER BY (departments.department_id) ASC`,function(err, res){
         if (err) throw err;
-        console.log(res[0]);
-        res.forEach(element => {
-            let department_id = element.department_id;
-            let deparment_name = element.department_name;
-            let over_head_costs = element.over_head_costs;
-            let product_sales = element.product_sales;
-            let total_profit = element.total_profit;
-            console.log(`${department_id} - ${deparment_name} - OverHead$ ${over_head_costs} - Sales ${product_sales} - Total Profit $ ${total_profit}`);        
-        });
+        console.table(res);
+    connection.end(); 
     })
+}
+
+//Create New Department 
+function addNewDept() {
+    inquirer.prompt([
+        {
+    type: "input",
+    name: "ndName",
+    message: "What is the new department name?"
+    },
+    {
+    type: "input",
+    name: "ndOverHead",
+    message: "What is the over head cost to take department on?"
+    }
+    ]).then(function(answer){;
+        var newDept = new NewDepartment(answer.ndName, Number(answer.ndOverHead));
+          console.log("Adding new department...\n");
+          connection.query(
+            "INSERT INTO departments SET ?",
+            {
+              department_name: newDept.department_name,
+              over_head_costs: newDept.over_head_costs
+            },
+        function(err, res) {
+            if (err) throw err; 
+            console.log("New Department added!\n");
+            }
+        );
+        connection.end();
+    });
 }

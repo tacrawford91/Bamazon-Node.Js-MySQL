@@ -28,6 +28,10 @@ SELECT * FROM departments;
 ALTER TABLE products
 ADD product_sales INT(100) NOT NULL;
 
+ALTER TABLE products
+MODIFY product_sales INT(100) DEFAULT 0; 
+
+
 INSERT INTO departments (department_name,over_head_costs)
 VALUES ("Electronics",10000),("Clothing",60000),("Kitchen",80000), ("Shoes",20000);
 
@@ -40,8 +44,10 @@ FROM products
 GROUP BY department_name
 ORDER BY (product_sales) DESC;
 
-SELECT departments.department_id, products.department_name, departments.over_head_costs, SUM(product_sales)
-from products right join departments 
+SELECT departments.department_id, products.department_name, departments.over_head_costs, SUM(product_sales) as product_sales, (SUM(product_sales) - departments.over_head_costs) as total_profit
+from products left join departments 
 on products.department_name = departments.department_name
 GROUP BY department_name
-ORDER BY (departments.department_id) ASC;
+ORDER BY (departments.department_id) ASC
+
+
