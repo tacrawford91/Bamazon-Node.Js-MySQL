@@ -11,7 +11,7 @@ var selectedItemNumber;
       host: "localhost",
       port: 3306,
       user: "root",
-      password: "Makerasll91!",
+      password: "redacted",
       database: "bamazon"
   })
 
